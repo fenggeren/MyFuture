@@ -97,6 +97,14 @@ struct CallbackF
 
 
 
+void test3()
+{
+//    makeFuture().then([](auto&& unit)
+//    {
+//        
+//    });
+}
+
 
 int main(int argc, const char * argv[])
 {

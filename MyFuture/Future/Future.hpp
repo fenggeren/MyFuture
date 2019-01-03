@@ -16,6 +16,43 @@
 #include "Try.hpp"
 
 
+// 根据参数不同调用不同
+
+template <typename T, typename F>
+class CoreCallbackState
+{
+    using DF = std::decay_t<F>;
+    template <typename R, std::size_t S>
+    using IfArgsSizeIs = std::enable_if_t<R::Arg::ArgsSize::value == S, int>;
+public:
+    CoreCallbackState(Promise<T>&& promise, F&& func)
+    :func_(std::forward<F>(func)), promise_(std::move(promise))
+    {
+    }
+    
+    template <typename U, typename R, IfArgsSizeIs<R,0> = 0>
+    auto invoke(U&& u, R)
+    {
+        return std::forward<F>(func_)(std::forward<U>(u));
+    }
+    
+    template <typename U, typename R, IfArgsSizeIs<R,1> = 0>
+    auto invoke(U&& u, R)
+    {
+        return std::forward<F>(func_)(std::forward<U>(u));
+    }
+    
+private:
+    DF func_;
+    Promise<T> promise_{Promise<T>::makeEmpty()};
+};
+
+template <typename T, typename F>
+auto makeCoreCallbackState(Promise<T>&& p, F&& f)
+{
+    return CoreCallbackState<T, F>(std::move(p), std::forward<F>(f));
+}
+
 template <typename T>
 class Future
 {
@@ -72,6 +109,66 @@ public:
         return fu;
     }
     
+    template <typename F>
+    Future<typename FutureThenCallbackResult<T, F>::value_type>
+    then(F&& func) &&
+    {
+        using R = typename FutureThenCallbackResult<T, F>::Result;
+        
+        Promise<R> p;
+        auto fu = p.getFuture();
+        
+        setCallback([state=makeCoreCallbackState(std::move(p),
+                                             std::forward<F>(func))]
+                    (Try<T>&& t) mutable
+                    {
+                        auto lambda = state.invoke(std::move(t), R{});
+                    });
+        
+        return R();
+    }
+    
+    
+    T value()
+    {
+        return core_->getTry().value();
+    }
+    
+protected:
+    
+    // [](Try<T>&&t){ return t.value(); }
+    template <typename F, typename R>
+    typename std::enable_if<!R::ReturnsFuture::value, typename R::Return>::type
+    thenImplementation(F&& func, R)
+    {
+        static_assert(R::Arg::ArgsSize::value <= 1,
+                      "Then must take zero/one argument");
+        using B = typename R::ReturnsFuture::Inner;
+        
+        Promise<B> p;
+        auto f = p.getFuture();
+        
+        setCallback([f=std::move(func), pro=std::move(p)]
+                    (Try<T>&& t) mutable
+                    {
+                        // 根据 R::Arg::ArgsSize::value的数量是否为0
+                        // invoke f不同
+                        
+                        pro.fulfil([&]{
+                            return f(std::move(t.value()));
+                        });
+                    });
+        
+        return f;
+    }
+    
+    // [](Try<T>&&t){ return makeFuture<T>(t); }
+    template <typename F, typename R>
+    typename std::enable_if<R::ReturnsFuture::value, typename R::Return>::type
+    thenImplementation(F&& func, R)
+    {
+        
+    }
     
 //    template <typename R>
 //    auto
@@ -96,12 +193,7 @@ public:
     {
         core_->setCallback(std::move(func));
     }
-    
-    T value()
-    {
-        return core_->getTry().value();
-    }
-    
+
 private:
     
     template <typename F, typename R>
@@ -123,12 +215,25 @@ private:
     Core<T>* core_;
 };
 
-Future<void> makeFuture()
+template <class T>
+Future<T> makeFuture(Try<T> t)
 {
-    Promise<void> p;
-
-    return p.getFuture();
+    return Future<T>(Core<T>::make());
 }
+
+
+template <class T>
+Future<typename std::decay<T>::type>
+makeFuture(T&& t)
+{
+    return makeFuture(Try<typename std::decay<T>::type>(std::forward<T>(t)));
+}
+
+Future<Unit> makeFuture()
+{
+    return makeFuture(Unit{});
+}
+
 
 
 

@@ -13,16 +13,29 @@
 
 template<typename T> class Future;
 
+
+
 template <typename T>
 class Promise
 {
+    struct EmptyConstruct
+    {
+    };
 public:
     
+    static Promise<T> makeEmpty()
+    {
+        return Promise<T>(EmptyConstruct{});
+    }
     
     Promise()
     {
         core_ = new Core<T>;
     }
+    
+    Promise(EmptyConstruct)
+    : core_(nullptr)
+    {}
     
     Future<T> getFuture()
     {
@@ -54,3 +67,5 @@ private:
     Core<T>* core_;
 
 };
+
+

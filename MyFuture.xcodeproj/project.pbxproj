@@ -30,6 +30,7 @@
 		1F4C75B621DDAF2400089BF7 /* Core.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Core.hpp; sourceTree = "<group>"; };
 		1F4C75B921DDB08600089BF7 /* FutureTraits.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FutureTraits.hpp; sourceTree = "<group>"; };
 		1F4C75BA21DDB27400089BF7 /* Try.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Try.hpp; sourceTree = "<group>"; };
+		1FDFE2CC21DE0CAD008A1BDE /* Unit.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Unit.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +77,7 @@
 				1F4C75B521DDAF2400089BF7 /* Future.hpp */,
 				1F4C75B621DDAF2400089BF7 /* Core.hpp */,
 				1F4C75BA21DDB27400089BF7 /* Try.hpp */,
+				1FDFE2CC21DE0CAD008A1BDE /* Unit.hpp */,
 			);
 			path = Future;
 			sourceTree = "<group>";

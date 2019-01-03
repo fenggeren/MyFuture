@@ -21,6 +21,12 @@ public:
     using Result = Try<T>;
     using Callback = std::function<void(Result&&)>;
     
+    static Core* make()
+    {
+        return new Core();
+    }
+    
+    
     Core()
     :attached_(2)
     {
