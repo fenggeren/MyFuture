@@ -15,6 +15,7 @@
 #include "FutureTraits.hpp"
 #include "Try.hpp"
 
+
 template <typename T>
 class Future
 {
@@ -32,49 +33,73 @@ public:
     }
     
     template <typename F>
-    auto thenValue(F&& func) &&
+    typename std::enable_if_t<
+    !std::is_same<T, void>::value,
+    Future<std::result_of_t<F(typename AliasIfVoid<T>::type&&)>>>
+    thenValue(F&& func) &&
     {
         using R = std::result_of_t<F(T)>;
         Promise<R> p;
         auto fu = p.getFuture();
-        auto lambda = [f=std::move(func), pro=std::move(p)]
-        (T&& val) mutable
+        setCallback([f=std::move(func), pro=std::move(p)]
+        (Try<T>&& t) mutable
         {
-            auto r = f(std::forward<T>(val));
-            pro.setValue(std::move(r));
-        };
-        
-        setCallback(std::move(lambda));
+            pro.fulfil([&]{
+                return f(std::move(t.value()));
+            });
+        });
         
         return fu;
     }
     
-    template <typename R>
-    auto
-    then(std::function<R(T)>&& func) -> Future<R>
+    template <typename F>
+    typename std::enable_if_t<
+    std::is_same<T, void>::value,
+    Future<std::result_of_t<F()>>>
+    thenValue(F&& func) &&
     {
+        using R = std::result_of_t<F()>;
         Promise<R> p;
-        auto future = p.getFuture();
-        
-        auto lambda = [f=std::move(func), pro=std::move(p)](T val) mutable
+        auto fu = p.getFuture();
+        setCallback([f=std::move(func), pro=std::move(p)]
+        (Try<T>&& t) mutable
         {
-            auto r = f(val);
-            pro.setValue(std::move(r));
-        };
+            pro.fulfil([&]{
+                return f();
+            });
+        });
         
-        setCallback(std::move(lambda));
-        
-        return future;
+        return fu;
     }
     
-    void setCallback(std::function<void(T)>&& func)
+    
+//    template <typename R>
+//    auto
+//    then(std::function<R(T)>&& func) -> Future<R>
+//    {
+//        Promise<R> p;
+//        auto future = p.getFuture();
+//
+//        auto lambda = [f=std::move(func), pro=std::move(p)](T val) mutable
+//        {
+//            auto r = f(val);
+//            pro.setValue(std::move(r));
+//        };
+//
+////        setCallback(std::move(lambda));
+//
+//        return future;
+//    }
+    
+    template <typename F>
+    void setCallback(F&& func)
     {
-        core_->setCallback(std::forward<decltype(func)>(func));
+        core_->setCallback(std::move(func));
     }
     
     T value()
     {
-        return core_->result();
+        return core_->getTry().value();
     }
     
 private:
@@ -98,7 +123,12 @@ private:
     Core<T>* core_;
 };
 
+Future<void> makeFuture()
+{
+    Promise<void> p;
 
+    return p.getFuture();
+}
 
 
 

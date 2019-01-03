@@ -20,7 +20,12 @@ struct FutureThenCallbackTraits
 };
 
 
-
+template <typename T>
+struct AliasIfVoid
+{
+    using type = typename std::conditional_t<
+    std::is_same<T, void>::value, int, T>;
+};
 
 
 

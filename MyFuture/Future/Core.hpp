@@ -18,7 +18,7 @@ class Core
 {
 public:
     
-    using Result = T;
+    using Result = Try<T>;
     using Callback = std::function<void(Result&&)>;
     
     Core()
@@ -39,16 +39,16 @@ public:
         detachOne();
     }
     
-    Result&& result()
+    Try<T>& getTry()
     {
-        return std::move(result_);
+        return result_;
     }
     
 private:
     
     void doCallback()
     {
-        callback_(result());
+        callback_(std::move(result_));
     }
     
     void detachOne() noexcept

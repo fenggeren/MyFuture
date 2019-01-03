@@ -29,9 +29,25 @@ public:
         return Future<T>(core_);
     }
     
-    void setValue(T&& val)
+    template <typename M>
+    void setValue(M&& val)
     {
-        core_->setResult(std::forward<T>(val));
+        fulfilTry(Try<T>(std::forward<M>(val)));
+    }
+    void setValue()
+    {
+        fulfilTry(Try<void>());
+    }
+    
+    void fulfilTry(Try<T>&& t)
+    {
+        core_->setResult(std::move(t));
+    }
+    
+    template <class F>
+    void fulfil(F&& func)
+    {
+        fulfilTry(makeTryFunction(std::forward<F>(func)));
     }
     
 private:
