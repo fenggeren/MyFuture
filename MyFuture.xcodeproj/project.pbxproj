@@ -25,6 +25,11 @@
 /* Begin PBXFileReference section */
 		1F4C75A921DDAF1800089BF7 /* MyFuture */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MyFuture; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F4C75AC21DDAF1800089BF7 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		1F4C75B421DDAF2400089BF7 /* Promise.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Promise.hpp; sourceTree = "<group>"; };
+		1F4C75B521DDAF2400089BF7 /* Future.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Future.hpp; sourceTree = "<group>"; };
+		1F4C75B621DDAF2400089BF7 /* Core.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Core.hpp; sourceTree = "<group>"; };
+		1F4C75B921DDB08600089BF7 /* FutureTraits.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FutureTraits.hpp; sourceTree = "<group>"; };
+		1F4C75BA21DDB27400089BF7 /* Try.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Try.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,9 +62,22 @@
 		1F4C75AB21DDAF1800089BF7 /* MyFuture */ = {
 			isa = PBXGroup;
 			children = (
+				1F4C75B321DDAF2400089BF7 /* Future */,
 				1F4C75AC21DDAF1800089BF7 /* main.cpp */,
 			);
 			path = MyFuture;
+			sourceTree = "<group>";
+		};
+		1F4C75B321DDAF2400089BF7 /* Future */ = {
+			isa = PBXGroup;
+			children = (
+				1F4C75B921DDB08600089BF7 /* FutureTraits.hpp */,
+				1F4C75B421DDAF2400089BF7 /* Promise.hpp */,
+				1F4C75B521DDAF2400089BF7 /* Future.hpp */,
+				1F4C75B621DDAF2400089BF7 /* Core.hpp */,
+				1F4C75BA21DDB27400089BF7 /* Try.hpp */,
+			);
+			path = Future;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -237,6 +255,7 @@
 		1F4C75B121DDAF1800089BF7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -245,6 +264,7 @@
 		1F4C75B221DDAF1800089BF7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
