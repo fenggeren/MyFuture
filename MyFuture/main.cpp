@@ -52,15 +52,19 @@ void test2()
                {
                    std::cout << val << std::endl;
                    return val + " Middle;";
+               })
+    .thenValue([](std::string&& val)
+      {
+          return val + " end;";
+      })
+    .thenValue([](std::string&& val)
+               {
+                   std::cout << val << std::endl;
+               })
+    .thenValue([]()
+               {
+                   return 111;
                });
-//    .thenValue([](std::string&& val)
-//      {
-//          return val + " end;";
-//      })
-//    .thenValue([](std::string&& val)
-//               {
-//                   std::cout << val << std::endl;
-//               });
     pro.setValue(100);
     std::cout << future.value() << std::endl;
 }
