@@ -106,10 +106,45 @@ void test3()
     });
 }
 
+#include <boost/asio.hpp>
+#include <thread>
+using namespace boost::asio;
+
+void test4()
+{
+    io_context ioc1;
+    io_context ioc2;
+    auto guard1 = make_work_guard(ioc1);
+    auto guard2 = make_work_guard(ioc2);
+    std::thread([&]{
+        ioc2.run();
+    }).detach();
+    
+    makeFuture("1234")
+    .thenValue([](std::string&& val)
+               {
+                   std::cout << val << "\n" << std::this_thread::get_id() << std::endl;
+                   return val + " begin: ";
+               })
+    .via(&ioc1)
+    .thenValue([](std::string&& val)
+               {
+                   std::cout << val  << "\n"<< std::this_thread::get_id() << std::endl;
+                   return 1234;
+               })
+    .via(&ioc2)
+    .thenValue([](int val)
+               {
+                   std::cout << val << "\n" << std::this_thread::get_id() << std::endl;
+               });
+    
+    ioc1.run();
+}
+
 
 int main(int argc, const char * argv[])
 {
-    test2();
+    test4();
     
     return 0;
 }

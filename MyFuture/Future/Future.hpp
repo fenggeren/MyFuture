@@ -88,6 +88,26 @@ public:
         
     }
     
+    ~Future()
+    {
+        if (core_)
+        {
+            core_ = nullptr;
+        }
+    }
+    
+public:
+    
+    template <typename Executor>
+    Future<T> via(Executor* executor)&&
+    {
+        core_->setExecutor(executor);
+        return std::move(*this);
+    }
+
+    
+public:
+    
     template <typename F>
     typename std::enable_if_t<
     !std::is_same<T, void>::value,
@@ -242,7 +262,7 @@ private:
 template <class T>
 Future<T> makeFuture(Try<T> t)
 {
-    return Future<T>(Core<T>::make());
+    return Future<T>(Core<T>::make(std::move(t)));
 }
 
 
