@@ -31,15 +31,34 @@ public:
     }
     
     template <typename U, typename R, IfArgsSizeIs<R,0> = 0>
-    auto invoke(U&& u, R)
+    auto invoke(Try<U>& t, R)
     {
-        return std::forward<F>(func_)(std::forward<U>(u));
+        return std::forward<F>(func_)();
     }
     
     template <typename U, typename R, IfArgsSizeIs<R,1> = 0>
-    auto invoke(U&& u, R)
+    auto invoke(Try<U>& t, R)
     {
-        return std::forward<F>(func_)(std::forward<U>(u));
+//        using Arg0 = typename R::Arg::ArgList::FirstArg;
+        return std::forward<F>(func_)(std::move(t.value()));
+    }
+
+//    template <typename U, typename R>
+//    auto invoke(U&& u, R)
+//    {
+//        return std::forward<F>(func_)(std::forward<U>(u));
+//    }
+    
+    void setTry(Try<T>&& t)
+    {
+        stealPromise().fulfilTry(std::move(t));
+    }
+    
+    
+    Promise<T> stealPromise()
+    {
+        func_.~DF();
+        return std::move(promise_);
     }
     
 private:
@@ -108,13 +127,13 @@ public:
         
         return fu;
     }
-    
+#if 0
     template <typename F>
     Future<typename FutureThenCallbackResult<T, F>::value_type>
     then(F&& func) &&
     {
-        using R = typename FutureThenCallbackResult<T, F>::Result;
-        
+        using FC = FutureThenCallbackResult<T, F>;
+        using R = typename FC::value_type;
         Promise<R> p;
         auto fu = p.getFuture();
         
@@ -122,12 +141,17 @@ public:
                                              std::forward<F>(func))]
                     (Try<T>&& t) mutable
                     {
-                        auto lambda = state.invoke(std::move(t), R{});
+                        state.setTry(
+                        makeTryFunction(
+                        [&]
+                        {
+                            return state.invoke(t, FC{});
+                        }));
                     });
         
-        return R();
+        return fu;
     }
-    
+#endif
     
     T value()
     {
@@ -233,8 +257,6 @@ Future<Unit> makeFuture()
 {
     return makeFuture(Unit{});
 }
-
-
 
 
 

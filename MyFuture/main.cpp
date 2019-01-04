@@ -36,38 +36,6 @@ void test()
 //    std::cout << fu.value() << std::endl;
 }
 
-void test2()
-{
-//    Promise<void> pro;
-    
-    
-    Promise<int> pro;
-    auto future = pro.getFuture()
-    .thenValue([](int val)
-    {
-        std::cout << val << std::endl;
-        return "start: ";
-    })
-    .thenValue([](std::string&& val)
-               {
-                   std::cout << val << std::endl;
-                   return val + " Middle;";
-               })
-    .thenValue([](std::string&& val)
-      {
-          return val + " end;";
-      })
-    .thenValue([](std::string&& val)
-               {
-                   std::cout << val << std::endl;
-               })
-    .thenValue([]()
-               {
-                   return 111;
-               });
-    pro.setValue(100);
-    std::cout << future.value() << std::endl;
-}
 
 struct tag_empty_t{};
 
@@ -97,12 +65,45 @@ struct CallbackF
 
 
 
+
+
+void test2()
+{
+    Promise<int> pro;
+    auto future = pro.getFuture()
+    .thenValue([](int val)
+               {
+                   std::cout << val << std::endl;
+                   return "start: ";
+               })
+    .thenValue([](std::string&& val)
+               {
+                   std::cout << val << std::endl;
+                   return val + " Middle;";
+               })
+    .thenValue([](std::string&& val)
+               {
+                   return val + " end;";
+               })
+    .thenValue([](std::string&& val)
+               {
+                   std::cout << val << std::endl;
+               })
+    .thenValue([]()
+               {
+                   return 111;
+               });
+    pro.setValue(100);
+    std::cout << future.value() << std::endl;
+}
+
+
 void test3()
 {
-//    makeFuture().then([](auto&& unit)
-//    {
-//        
-//    });
+    makeFuture().thenValue([](auto&&)
+    {
+        return 123;
+    });
 }
 
 

@@ -10,17 +10,14 @@
 #include <functional>
 #include "Core.hpp"
 #include "Future.hpp"
+#include "Unit.hpp"
 
 template<typename T> class Future;
-
 
 
 template <typename T>
 class Promise
 {
-    struct EmptyConstruct
-    {
-    };
 public:
     
     static Promise<T> makeEmpty()

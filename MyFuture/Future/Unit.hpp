@@ -10,6 +10,10 @@
  
 #include <type_traits>
 
+struct EmptyConstruct
+{
+    
+};
 
 struct Unit
 {
